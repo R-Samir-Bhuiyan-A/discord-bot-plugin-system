@@ -8,18 +8,20 @@ The `core.api` object provides methods for plugins to register functionality.
 
 ### registerCommand(name, description, handler)
 
-Registers a new Discord command.
+Registers a new Discord command. This method is used internally by the core system. Plugins should use the plugin-specific version.
 
 - `name` (string): The command name
 - `description` (string): The command description
 - `handler` (function): The function to call when the command is used
 
-Example:
-```javascript
-core.api.registerCommand('hello', 'Say hello', async (interaction) => {
-  await interaction.reply('Hello, world!');
-});
-```
+### registerPluginCommand(pluginName, name, description, handler)
+
+Registers a new Discord command from a plugin. This is the plugin-specific version that tracks command ownership.
+
+- `pluginName` (string): The name of the plugin registering the command
+- `name` (string): The command name
+- `description` (string): The command description
+- `handler` (function): The function to call when the command is used
 
 ### registerEvent(event, handler)
 

@@ -17,6 +17,16 @@ class API {
     this.commands.set(name, { description, handler });
     console.log(`Registered command: ${name}`);
   }
+  
+  // Register a Discord command from a plugin
+  registerPluginCommand(pluginName, name, description, handler) {
+    if (typeof name !== 'string' || typeof description !== 'string' || typeof handler !== 'function') {
+      throw new Error('Invalid parameters for registerCommand');
+    }
+    
+    // Delegate to DiscordManager for plugin-specific command registration
+    this.core.discord.registerPluginCommand(pluginName, name, description, handler);
+  }
 
   // Register an event handler
   registerEvent(event, handler) {

@@ -7,6 +7,7 @@ class DiscordManager {
     this.core = core;
     this.client = null;
     this.rest = null;
+    this.registeredCommands = new Map(); // Track commands registered by plugins
   }
 
   async init() {
@@ -128,6 +129,38 @@ class DiscordManager {
       userCount: this.client.users ? this.client.users.cache.size : 0,
       uptime: this.client.uptime ? this.client.uptime : 0
     };
+  }
+  
+  // Register a command from a plugin
+  registerPluginCommand(pluginName, commandName, description, handler) {
+    // Store the command with plugin association
+    this.registeredCommands.set(commandName, pluginName);
+    
+    // Register with the core API
+    this.core.api.registerCommand(commandName, description, handler);
+    
+    // Re-register all commands with Discord
+    this.registerCommands();
+  }
+  
+  // Unregister all commands associated with a plugin
+  unregisterPluginCommands(pluginName) {
+    // Find and remove commands associated with this plugin
+    const commandsToRemove = [];
+    for (const [commandName, associatedPlugin] of this.registeredCommands) {
+      if (associatedPlugin === pluginName) {
+        commandsToRemove.push(commandName);
+      }
+    }
+    
+    // Remove the commands from tracking
+    for (const commandName of commandsToRemove) {
+      this.registeredCommands.delete(commandName);
+      this.core.api.commands.delete(commandName);
+    }
+    
+    // Re-register remaining commands with Discord
+    this.registerCommands();
   }
 }
 

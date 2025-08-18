@@ -52,3 +52,4 @@
 - Added plugin deletion functionality with confirmation dialog
 - Improved frontend error handling and user feedback
 - Added real-time bot status dashboard with monitoring
+- Fixed plugin state persistence and command registration issues

@@ -69,11 +69,14 @@ class PluginLoader {
       const pluginModule = require(entryPath);
       
       // Store plugin reference
-      this.plugins.set(pluginName, {
+      const plugin = {
+        name: pluginName,
         manifest,
         module: pluginModule,
         enabled: false
-      });
+      };
+      
+      this.plugins.set(pluginName, plugin);
       
       console.log(`Loaded plugin: ${pluginName}`);
       
@@ -152,6 +155,9 @@ class PluginLoader {
         console.log(`Plugin ${pluginName} is already disabled`);
         return;
       }
+      
+      // Unregister plugin commands
+      this.sandbox.unregisterPluginCommands(pluginName);
       
       // Destroy plugin in sandbox
       try {

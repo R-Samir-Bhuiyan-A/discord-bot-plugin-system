@@ -6,6 +6,7 @@ const path = require('path');
 class PluginSandbox {
   constructor(core) {
     this.core = core;
+    this.pluginCommands = new Map(); // Track commands registered by each plugin
   }
 
   async runPluginMethod(pluginName, pluginModule, method, ...args) {
@@ -26,7 +27,7 @@ class PluginSandbox {
             debug: (...args) => console.debug(`[${pluginName}]`, ...args),
           },
           // Plugin can access core API but in a controlled way
-          core: this.createSandboxedCoreAPI(),
+          core: this.createSandboxedCoreAPI(pluginName),
           // Standard JavaScript globals
           setTimeout,
           setInterval,
@@ -92,12 +93,22 @@ class PluginSandbox {
     });
   }
 
-  createSandboxedCoreAPI() {
+  createSandboxedCoreAPI(pluginName) {
     // Create a limited version of the core API
     // This prevents plugins from accessing sensitive parts of the core
     return {
       api: {
-        registerCommand: this.core.api.registerCommand.bind(this.core.api),
+        // Plugin-specific command registration
+        registerCommand: (name, description, handler) => {
+          // Track the command for this plugin
+          if (!this.pluginCommands.has(pluginName)) {
+            this.pluginCommands.set(pluginName, []);
+          }
+          this.pluginCommands.get(pluginName).push(name);
+          
+          // Delegate to the core API's plugin-specific command registration
+          this.core.api.registerPluginCommand(pluginName, name, description, handler);
+        },
         registerEvent: this.core.api.registerEvent.bind(this.core.api),
         registerRoute: this.core.api.registerRoute.bind(this.core.api),
         registerPage: this.core.api.registerPage.bind(this.core.api),
@@ -108,6 +119,17 @@ class PluginSandbox {
         getPlugins: this.core.api.getPlugins.bind(this.core.api),
       }
     };
+  }
+  
+  // Unregister all commands associated with a plugin
+  unregisterPluginCommands(pluginName) {
+    if (this.pluginCommands.has(pluginName)) {
+      // Unregister commands from DiscordManager
+      this.core.discord.unregisterPluginCommands(pluginName);
+      
+      // Remove tracking
+      this.pluginCommands.delete(pluginName);
+    }
   }
 }
 
