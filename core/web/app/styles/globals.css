@@ -1,0 +1,271 @@
+/* core/web/app/styles/globals.css */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Custom CSS variables for consistent theming */
+:root {
+  --primary-color: #4f46e5;
+  --primary-hover: #4338ca;
+  --secondary-color: #f9fafb;
+  --accent-color: #f3f4f6;
+  --text-primary: #1f2937;
+  --text-secondary: #6b7280;
+  --border-color: #e5e7eb;
+  --success-color: #10b981;
+  --warning-color: #f59e0b;
+  --error-color: #ef4444;
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+/* Base styles */
+html, body {
+  padding: 0;
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  background-color: #f9fafb;
+  color: var(--text-primary);
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+/* Custom component classes */
+.btn {
+  @apply inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors;
+}
+
+.btn-primary {
+  @apply btn bg-indigo-600 text-white hover:bg-indigo-700 focus:ring-indigo-500;
+}
+
+.btn-secondary {
+  @apply btn bg-gray-200 text-gray-700 hover:bg-gray-300 focus:ring-gray-500;
+}
+
+.btn-success {
+  @apply btn bg-green-600 text-white hover:bg-green-700 focus:ring-green-500;
+}
+
+.btn-warning {
+  @apply btn bg-yellow-500 text-white hover:bg-yellow-600 focus:ring-yellow-500;
+}
+
+.btn-danger {
+  @apply btn bg-red-600 text-white hover:bg-red-700 focus:ring-red-500;
+}
+
+.btn-sm {
+  @apply px-2.5 py-1.5 text-xs;
+}
+
+.btn-lg {
+  @apply px-6 py-3 text-base;
+}
+
+.card {
+  @apply bg-white rounded-lg shadow-md overflow-hidden transition-shadow duration-300 hover:shadow-lg;
+}
+
+.badge {
+  @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
+}
+
+.badge-success {
+  @apply badge bg-green-100 text-green-800;
+}
+
+.badge-warning {
+  @apply badge bg-yellow-100 text-yellow-800;
+}
+
+.badge-error {
+  @apply badge bg-red-100 text-red-800;
+}
+
+.badge-info {
+  @apply badge bg-blue-100 text-blue-800;
+}
+
+.input {
+  @apply block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm;
+}
+
+.textarea {
+  @apply block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm;
+}
+
+.form-group {
+  @apply mb-4;
+}
+
+.form-label {
+  @apply block text-sm font-medium text-gray-700 mb-1;
+}
+
+.alert {
+  @apply p-4 rounded-md;
+}
+
+.alert-success {
+  @apply alert bg-green-50 text-green-800 border border-green-200;
+}
+
+.alert-warning {
+  @apply alert bg-yellow-50 text-yellow-800 border border-yellow-200;
+}
+
+.alert-error {
+  @apply alert bg-red-50 text-red-800 border border-red-200;
+}
+
+.alert-info {
+  @apply alert bg-blue-50 text-blue-800 border border-blue-200;
+}
+
+/* Layout adjustments */
+.container {
+  @apply mx-auto px-4 sm:px-6 lg:px-8;
+}
+
+.main-content {
+  @apply py-6;
+}
+
+/* Navigation styles */
+.navbar {
+  @apply bg-white shadow-sm;
+}
+
+.navbar-container {
+  @apply container mx-auto px-4 sm:px-6 lg:px-8;
+}
+
+.navbar-content {
+  @apply flex justify-between h-16;
+}
+
+.navbar-brand {
+  @apply flex items-center text-xl font-bold text-gray-800 hover:text-gray-600;
+}
+
+.navbar-nav {
+  @apply flex items-center space-x-4;
+}
+
+.nav-link {
+  @apply text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium transition-colors;
+}
+
+.nav-link-active {
+  @apply text-gray-900 bg-gray-100;
+}
+
+/* Dashboard specific styles */
+.dashboard-header {
+  @apply text-center mb-12;
+}
+
+.dashboard-title {
+  @apply text-4xl font-bold text-gray-900 mb-4;
+}
+
+.dashboard-subtitle {
+  @apply text-xl text-gray-600;
+}
+
+.dashboard-grid {
+  @apply grid grid-cols-1 md:grid-cols-3 gap-8 mb-12;
+}
+
+.dashboard-card {
+  @apply bg-white rounded-lg shadow-md p-6 transition-all duration-300 hover:shadow-lg;
+}
+
+.dashboard-card-title {
+  @apply text-xl font-semibold mb-3;
+}
+
+.dashboard-card-content {
+  @apply text-gray-600 mb-4;
+}
+
+.dashboard-card-link {
+  @apply text-indigo-600 hover:text-indigo-800 font-medium transition-colors;
+}
+
+/* Plugin page styles */
+.plugin-grid {
+  @apply grid grid-cols-1 md:grid-cols-2 gap-6;
+}
+
+.plugin-section {
+  @apply mb-8;
+}
+
+.plugin-section-header {
+  @apply flex justify-between items-center mb-4;
+}
+
+.plugin-section-title {
+  @apply text-2xl font-semibold;
+}
+
+.plugin-list {
+  @apply space-y-4;
+}
+
+.plugin-item {
+  @apply border rounded-lg p-4 shadow-sm transition-all duration-300 hover:shadow-md;
+}
+
+.plugin-item-header {
+  @apply flex justify-between items-start;
+}
+
+.plugin-item-content {
+  @apply flex-1;
+}
+
+.plugin-item-title {
+  @apply text-lg font-medium;
+}
+
+.plugin-item-description {
+  @apply text-gray-600 mt-1;
+}
+
+.plugin-item-meta {
+  @apply text-sm text-gray-500 mt-1;
+}
+
+.plugin-item-actions {
+  @apply mt-3 flex space-x-2;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .dashboard-grid {
+    @apply grid-cols-1;
+  }
+  
+  .plugin-grid {
+    @apply grid-cols-1;
+  }
+  
+  .navbar-content {
+    @apply h-auto flex-col py-4;
+  }
+  
+  .navbar-nav {
+    @apply mt-4 space-x-0 space-y-2;
+  }
+}

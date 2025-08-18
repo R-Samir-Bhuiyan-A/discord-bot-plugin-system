@@ -2,6 +2,7 @@
 const DiscordManager = require('./discord');
 const WebServer = require('./web');
 const PluginLoader = require('./loader');
+const PluginRepository = require('./repo');
 const API = require('./api');
 
 class CoreSystem {
@@ -9,6 +10,7 @@ class CoreSystem {
     this.discord = new DiscordManager(this);
     this.web = new WebServer(this);
     this.plugins = new PluginLoader(this);
+    this.repo = new PluginRepository(this);
     this.api = new API(this);
     
     // Bind API to this context
@@ -21,7 +23,12 @@ class CoreSystem {
     // Bind plugin management functions to API
     this.api.enablePlugin = this.plugins.enablePlugin.bind(this.plugins);
     this.api.disablePlugin = this.plugins.disablePlugin.bind(this.plugins);
+    this.api.deletePlugin = this.plugins.deletePlugin.bind(this.plugins);
     this.api.getPlugins = this.plugins.getPlugins.bind(this.plugins);
+    
+    // Bind repository functions to API
+    this.api.getAvailablePlugins = this.repo.getAvailablePlugins.bind(this.repo);
+    this.api.installPlugin = this.repo.installPlugin.bind(this.repo);
   }
 
   async start() {
@@ -32,6 +39,9 @@ class CoreSystem {
       await this.discord.init();
       await this.web.init();
       await this.plugins.init();
+      
+      // Register core API routes for plugin management
+      await this.registerCoreAPIRoutes();
       
       // Register Discord commands after plugins are loaded
       await this.discord.registerCommands();
@@ -56,6 +66,108 @@ class CoreSystem {
     } catch (error) {
       console.error('Error while stopping core system:', error);
     }
+  }
+  
+  // Register core API routes for plugin management
+  async registerCoreAPIRoutes() {
+    // Get list of installed plugins
+    this.api.registerRoute('/api/plugins', (req, res) => {
+      try {
+        const plugins = this.api.getPlugins();
+        res.json(plugins);
+      } catch (error) {
+        console.error('Error fetching plugins:', error);
+        res.statusCode = 500;
+        res.json({ error: 'Failed to fetch plugins' });
+      }
+    });
+    
+    // Enable a plugin
+    this.api.registerRoute('/api/plugins/enable', async (req, res) => {
+      try {
+        const { pluginName } = req.body;
+        if (!pluginName) {
+          res.statusCode = 400;
+          return res.json({ error: 'Plugin name is required' });
+        }
+        
+        await this.api.enablePlugin(pluginName);
+        res.json({ message: `Plugin ${pluginName} enabled successfully` });
+      } catch (error) {
+        console.error('Error enabling plugin:', error);
+        res.statusCode = 500;
+        res.json({ error: error.message || 'Failed to enable plugin' });
+      }
+    });
+    
+    // Disable a plugin
+    this.api.registerRoute('/api/plugins/disable', async (req, res) => {
+      try {
+        const { pluginName } = req.body;
+        if (!pluginName) {
+          res.statusCode = 400;
+          return res.json({ error: 'Plugin name is required' });
+        }
+        
+        await this.api.disablePlugin(pluginName);
+        res.json({ message: `Plugin ${pluginName} disabled successfully` });
+      } catch (error) {
+        console.error('Error disabling plugin:', error);
+        res.statusCode = 500;
+        res.json({ error: error.message || 'Failed to disable plugin' });
+      }
+    });
+    
+    // Delete a plugin
+    this.api.registerRoute('/api/plugins/delete', async (req, res) => {
+      try {
+        const { pluginName } = req.body;
+        if (!pluginName) {
+          res.statusCode = 400;
+          return res.json({ error: 'Plugin name is required' });
+        }
+        
+        console.log(`API request to delete plugin: ${pluginName}`);
+        await this.api.deletePlugin(pluginName);
+        res.json({ message: `Plugin ${pluginName} deleted successfully` });
+      } catch (error) {
+        console.error('Error deleting plugin:', error);
+        res.statusCode = 500;
+        res.json({ error: error.message || 'Failed to delete plugin' });
+      }
+    });
+    
+    // Get list of available plugins from repository
+    this.api.registerRoute('/api/repo/plugins', async (req, res) => {
+      try {
+        const plugins = await this.api.getAvailablePlugins();
+        res.json(plugins);
+      } catch (error) {
+        console.error('Error fetching available plugins:', error);
+        res.statusCode = 500;
+        res.json({ error: error.message || 'Failed to fetch available plugins' });
+      }
+    });
+    
+    // Install a plugin from repository
+    this.api.registerRoute('/api/repo/install', async (req, res) => {
+      try {
+        const { pluginName } = req.body;
+        if (!pluginName) {
+          res.statusCode = 400;
+          return res.json({ error: 'Plugin name is required' });
+        }
+        
+        await this.api.installPlugin(pluginName);
+        res.json({ message: `Plugin ${pluginName} installed successfully` });
+      } catch (error) {
+        console.error('Error installing plugin:', error);
+        res.statusCode = 500;
+        res.json({ error: error.message || 'Failed to install plugin' });
+      }
+    });
+    
+    console.log('Registered core API routes for plugin management');
   }
 }
 

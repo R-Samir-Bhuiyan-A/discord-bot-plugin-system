@@ -10,6 +10,7 @@ class PluginLoader {
     this.enabledPlugins = new Map(); // Currently enabled plugins
     this.pluginPath = path.join(__dirname, '..', '..', 'plugins');
     this.sandbox = new PluginSandbox(core);
+    this.stateFile = path.join(__dirname, '..', '..', 'config', 'plugin-states.json');
   }
 
   async init() {
@@ -21,6 +22,9 @@ class PluginLoader {
         await fs.mkdir(this.pluginPath, { recursive: true });
       }
 
+      // Load plugin states
+      const pluginStates = await this.loadPluginStates();
+
       // Load all plugins
       const pluginDirs = await fs.readdir(this.pluginPath);
       
@@ -29,7 +33,7 @@ class PluginLoader {
         const stat = await fs.stat(pluginDir);
         
         if (stat.isDirectory()) {
-          await this.loadPlugin(dir);
+          await this.loadPlugin(dir, pluginStates[dir] !== false); // Enable by default unless explicitly disabled
         }
       }
       
@@ -40,7 +44,7 @@ class PluginLoader {
     }
   }
 
-  async loadPlugin(pluginName) {
+  async loadPlugin(pluginName, shouldBeEnabled = true) {
     try {
       const pluginDir = path.join(this.pluginPath, pluginName);
       const manifestPath = path.join(pluginDir, 'plugin.json');
@@ -73,8 +77,10 @@ class PluginLoader {
       
       console.log(`Loaded plugin: ${pluginName}`);
       
-      // Enable the plugin by default
-      await this.enablePlugin(pluginName);
+      // Enable the plugin if it should be enabled
+      if (shouldBeEnabled) {
+        await this.enablePlugin(pluginName);
+      }
     } catch (error) {
       console.error(`Failed to load plugin ${pluginName}:`, error);
     }
@@ -105,7 +111,7 @@ class PluginLoader {
     try {
       const plugin = this.plugins.get(pluginName);
       if (!plugin) {
-        throw new Error(`Plugin ${pluginName} is not loaded`);
+        throw new Error(`Plugin ${pluginName} not found`);
       }
       
       if (plugin.enabled) {
@@ -125,9 +131,13 @@ class PluginLoader {
       plugin.enabled = true;
       this.enabledPlugins.set(pluginName, plugin);
       
+      // Save plugin state
+      await this.savePluginState(pluginName, true);
+      
       console.log(`Enabled plugin: ${pluginName}`);
     } catch (error) {
       console.error(`Failed to enable plugin ${pluginName}:`, error);
+      throw error; // Re-throw the error so the API can handle it
     }
   }
 
@@ -135,7 +145,7 @@ class PluginLoader {
     try {
       const plugin = this.plugins.get(pluginName);
       if (!plugin) {
-        throw new Error(`Plugin ${pluginName} is not loaded`);
+        throw new Error(`Plugin ${pluginName} not found`);
       }
       
       if (!plugin.enabled) {
@@ -154,9 +164,47 @@ class PluginLoader {
       plugin.enabled = false;
       this.enabledPlugins.delete(pluginName);
       
+      // Save plugin state
+      await this.savePluginState(pluginName, false);
+      
       console.log(`Disabled plugin: ${pluginName}`);
     } catch (error) {
       console.error(`Failed to disable plugin ${pluginName}:`, error);
+      throw error; // Re-throw the error so the API can handle it
+    }
+  }
+
+  async deletePlugin(pluginName) {
+    try {
+      const plugin = this.plugins.get(pluginName);
+      if (!plugin) {
+        throw new Error(`Plugin ${pluginName} not found`);
+      }
+      
+      console.log(`Deleting plugin: ${pluginName}`);
+      
+      // Disable plugin if it's enabled
+      if (plugin.enabled) {
+        console.log(`Disabling plugin ${pluginName} before deletion`);
+        await this.disablePlugin(pluginName);
+      }
+      
+      // Remove plugin directory
+      const pluginDir = path.join(this.pluginPath, pluginName);
+      console.log(`Removing plugin directory: ${pluginDir}`);
+      await fs.rm(pluginDir, { recursive: true, force: true });
+      
+      // Remove plugin reference
+      this.plugins.delete(pluginName);
+      
+      // Remove plugin state
+      console.log(`Removing plugin state for: ${pluginName}`);
+      await this.removePluginState(pluginName);
+      
+      console.log(`Deleted plugin: ${pluginName}`);
+    } catch (error) {
+      console.error(`Failed to delete plugin ${pluginName}:`, error);
+      throw error;
     }
   }
 
@@ -184,6 +232,66 @@ class PluginLoader {
   // Get list of enabled plugins
   getEnabledPlugins() {
     return Array.from(this.enabledPlugins.keys());
+  }
+  
+  // Load plugin states from file
+  async loadPluginStates() {
+    try {
+      const data = await fs.readFile(this.stateFile, 'utf8');
+      return JSON.parse(data);
+    } catch (error) {
+      // If file doesn't exist or is invalid, return empty object
+      return {};
+    }
+  }
+  
+  // Save plugin state to file
+  async savePluginState(pluginName, enabled) {
+    try {
+      // Load existing states
+      const states = await this.loadPluginStates();
+      
+      // Update state for this plugin
+      states[pluginName] = enabled;
+      
+      // Create config directory if it doesn't exist
+      const configDir = path.dirname(this.stateFile);
+      try {
+        await fs.access(configDir);
+      } catch (error) {
+        await fs.mkdir(configDir, { recursive: true });
+      }
+      
+      // Save states to file
+      await fs.writeFile(this.stateFile, JSON.stringify(states, null, 2));
+    } catch (error) {
+      console.error(`Failed to save plugin state for ${pluginName}:`, error);
+    }
+  }
+  
+  // Remove plugin state from file
+  async removePluginState(pluginName) {
+    try {
+      // Load existing states
+      const states = await this.loadPluginStates();
+      
+      // Remove state for this plugin
+      delete states[pluginName];
+      
+      // Create config directory if it doesn't exist
+      const configDir = path.dirname(this.stateFile);
+      try {
+        await fs.access(configDir);
+      } catch (error) {
+        // If config directory doesn't exist, there's nothing to remove
+        return;
+      }
+      
+      // Save states to file
+      await fs.writeFile(this.stateFile, JSON.stringify(states, null, 2));
+    } catch (error) {
+      console.error(`Failed to remove plugin state for ${pluginName}:`, error);
+    }
   }
 }
 

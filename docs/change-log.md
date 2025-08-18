@@ -39,3 +39,14 @@
 - Created tests for plugin sandboxing functionality
 - Fixed web server to prevent plugin errors from crashing the system
 - Created GitHub repository and pushed code
+- Implemented plugin repository system for browsing and installing plugins
+- Added repository management API endpoints to example plugin
+- Enhanced web UI with Tailwind CSS styling
+- Created layout component for consistent navigation
+- Improved plugin store page with better UI
+- Created local plugin repository server for testing
+- Moved plugin management API endpoints from example plugin to core system
+- Improved error handling in PluginLoader and PluginRepository
+- Added better error messages and status codes to API responses
+- Implemented persistent plugin states across application restarts
+- Added plugin deletion functionality

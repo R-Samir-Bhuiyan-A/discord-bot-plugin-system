@@ -1,2 +1,13 @@
 node_modules
 .env
+core/web/app/.next
+core/web/app/out
+core/web/app/.tmp
+core/web/app/.swc
+core/web/app/.sass-cache
+core/web/app/.vscode
+core/web/app/.idea
+core/web/app/.DS_Store
+core/web/app/coverage
+core/web/app/.nyc_output
+config/plugin-states.json

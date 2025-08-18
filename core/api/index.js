@@ -63,7 +63,7 @@ class API {
   }
   
   // Plugin management functions (bound to PluginLoader in CoreSystem)
-  // These will be bound to the PluginLoader instance
+  // These will be bound to PluginLoader instance
   enablePlugin(pluginName) {
     // This will be bound to PluginLoader.enablePlugin
     throw new Error('enablePlugin not bound to PluginLoader');
@@ -74,9 +74,26 @@ class API {
     throw new Error('disablePlugin not bound to PluginLoader');
   }
   
+  deletePlugin(pluginName) {
+    // This will be bound to PluginLoader.deletePlugin
+    throw new Error('deletePlugin not bound to PluginLoader');
+  }
+  
   getPlugins() {
     // This will be bound to PluginLoader.getPlugins
     throw new Error('getPlugins not bound to PluginLoader');
+  }
+  
+  // Repository functions (bound to PluginRepository in CoreSystem)
+  // These will be bound to PluginRepository instance
+  getAvailablePlugins() {
+    // This will be bound to PluginRepository.getAvailablePlugins
+    throw new Error('getAvailablePlugins not bound to PluginRepository');
+  }
+  
+  installPlugin(pluginName) {
+    // This will be bound to PluginRepository.installPlugin
+    throw new Error('installPlugin not bound to PluginRepository');
   }
 }
 

@@ -8,8 +8,11 @@
 - [x] Real-time enable/disable and sandboxing
 
 ## Phase 3 – Plugin Store
-- [ ] Web UI for repo/manual install
-- [ ] Versioning & backup system
+- [x] Web UI for repo/manual install
+- [x] Versioning & backup system
+- [x] Core API endpoints for plugin management
+- [x] Persistent plugin states across restarts
+- [x] Plugin deletion functionality
 
 ## Phase 4 – Reliability & Scheduler
 - [ ] Logging, auto-reload, sandboxing
