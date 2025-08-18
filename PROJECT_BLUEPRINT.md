@@ -96,7 +96,8 @@ Highly modular and maintainable:
     │   ├── discord/       # Base bot connection
     │   ├── web/           # Base Web UI + plugin store
     │   ├── api/           # Core API exposed to plugins
-    │   └── loader/        # Plugin loader and manager
+    │   ├── loader/        # Plugin loader and manager
+    │   └── repo/          # Plugin repository manager
     ├── plugins/           # Installed plugins
     │   └── example-plugin/
     │       ├── plugin.json
@@ -172,6 +173,8 @@ Highly modular and maintainable:
 **Phase 3 – Plugin Store**  
 - Web UI for repo/manual install  
 - Versioning & backup system
+- Persistent plugin states across restarts
+- Plugin deletion functionality
 
 **Phase 4 – Reliability & Scheduler**  
 - Logging, auto-reload, sandboxing  

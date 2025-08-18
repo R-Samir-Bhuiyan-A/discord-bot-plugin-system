@@ -6,7 +6,7 @@ module.exports = {
       await interaction.reply('Hello, world! This is the example plugin.');
     });
 
-    // Register a web route
+    // Register a web route using plugin-specific method
     core.api.registerRoute('/api/hello', (req, res) => {
       res.json({ message: 'Hello from the example plugin!' });
     });
