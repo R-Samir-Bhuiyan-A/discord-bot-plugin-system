@@ -7,6 +7,7 @@ class PluginSandbox {
   constructor(core) {
     this.core = core;
     this.pluginCommands = new Map(); // Track commands registered by each plugin
+    this.pluginRoutes = new Map(); // Track routes registered by each plugin
   }
 
   async runPluginMethod(pluginName, pluginModule, method, ...args) {
@@ -109,8 +110,18 @@ class PluginSandbox {
           // Delegate to the core API's plugin-specific command registration
           this.core.api.registerPluginCommand(pluginName, name, description, handler);
         },
+        // Plugin-specific route registration
+        registerRoute: (path, handler) => {
+          // Track the route for this plugin
+          if (!this.pluginRoutes.has(pluginName)) {
+            this.pluginRoutes.set(pluginName, []);
+          }
+          this.pluginRoutes.get(pluginName).push(path);
+          
+          // Delegate to the core API's plugin-specific route registration
+          this.core.api.registerPluginRoute(pluginName, path, handler);
+        },
         registerEvent: this.core.api.registerEvent.bind(this.core.api),
-        registerRoute: this.core.api.registerRoute.bind(this.core.api),
         registerPage: this.core.api.registerPage.bind(this.core.api),
         getLogger: this.core.api.getLogger.bind(this.core.api),
         // Plugin management functions
@@ -121,14 +132,24 @@ class PluginSandbox {
     };
   }
   
-  // Unregister all commands associated with a plugin
-  unregisterPluginCommands(pluginName) {
+  // Unregister all commands and routes associated with a plugin
+  unregisterPluginResources(pluginName) {
+    // Unregister commands
     if (this.pluginCommands.has(pluginName)) {
       // Unregister commands from DiscordManager
       this.core.discord.unregisterPluginCommands(pluginName);
       
       // Remove tracking
       this.pluginCommands.delete(pluginName);
+    }
+    
+    // Unregister routes
+    if (this.pluginRoutes.has(pluginName)) {
+      // Unregister routes from API
+      this.core.api.unregisterPluginRoutes(pluginName);
+      
+      // Remove tracking
+      this.pluginRoutes.delete(pluginName);
     }
   }
 }

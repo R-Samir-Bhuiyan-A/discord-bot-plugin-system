@@ -33,7 +33,9 @@ class PluginLoader {
         const stat = await fs.stat(pluginDir);
         
         if (stat.isDirectory()) {
-          await this.loadPlugin(dir, pluginStates[dir] !== false); // Enable by default unless explicitly disabled
+          // Enable plugin if it's not explicitly disabled in the states file
+          const shouldBeEnabled = pluginStates[dir] !== false;
+          await this.loadPlugin(dir, shouldBeEnabled);
         }
       }
       
@@ -156,8 +158,8 @@ class PluginLoader {
         return;
       }
       
-      // Unregister plugin commands
-      this.sandbox.unregisterPluginCommands(pluginName);
+      // Unregister plugin resources (commands, routes, etc.)
+      this.sandbox.unregisterPluginResources(pluginName);
       
       // Destroy plugin in sandbox
       try {

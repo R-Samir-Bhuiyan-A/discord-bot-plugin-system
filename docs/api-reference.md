@@ -39,17 +39,18 @@ core.api.registerEvent('messageCreate', (message) => {
 
 ### registerRoute(path, handler)
 
-Registers a new web route.
+Registers a new web route. This method is used internally by the core system. Plugins should use the plugin-specific version.
 
 - `path` (string): The URL path
 - `handler` (function): The function to call when the route is accessed
 
-Example:
-```javascript
-core.api.registerRoute('/api/hello', (req, res) => {
-  res.json({ message: 'Hello, world!' });
-});
-```
+### registerPluginRoute(pluginName, path, handler)
+
+Registers a new web route from a plugin. This is the plugin-specific version that tracks route ownership.
+
+- `pluginName` (string): The name of the plugin registering the route
+- `path` (string): The URL path
+- `handler` (function): The function to call when the route is accessed
 
 ### registerPage(path, component)
 
@@ -74,6 +75,12 @@ Example:
 const logger = core.api.getLogger('my-plugin');
 logger.info('Plugin loaded');
 ```
+
+### unregisterPluginRoutes(pluginName)
+
+Unregisters all web routes associated with a plugin.
+
+- `pluginName` (string): The name of the plugin whose routes should be unregistered
 
 ## Plugin Management API
 

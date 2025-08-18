@@ -6,6 +6,7 @@ class API {
     this.events = new Map();
     this.routes = new Map();
     this.pages = new Map();
+    this.pluginRoutes = new Map(); // Track routes registered by each plugin
   }
 
   // Register a Discord command
@@ -50,6 +51,35 @@ class API {
     
     this.routes.set(path, handler);
     console.log(`Registered route: ${path}`);
+  }
+  
+  // Register a web route from a plugin
+  registerPluginRoute(pluginName, path, handler) {
+    if (typeof path !== 'string' || typeof handler !== 'function') {
+      throw new Error('Invalid parameters for registerRoute');
+    }
+    
+    // Track the route for this plugin
+    if (!this.pluginRoutes.has(pluginName)) {
+      this.pluginRoutes.set(pluginName, []);
+    }
+    this.pluginRoutes.get(pluginName).push(path);
+    
+    // Register the route
+    this.routes.set(path, handler);
+    console.log(`Registered plugin route: ${path}`);
+  }
+  
+  // Unregister all routes associated with a plugin
+  unregisterPluginRoutes(pluginName) {
+    if (this.pluginRoutes.has(pluginName)) {
+      const routes = this.pluginRoutes.get(pluginName);
+      for (const path of routes) {
+        this.routes.delete(path);
+        console.log(`Unregistered plugin route: ${path}`);
+      }
+      this.pluginRoutes.delete(pluginName);
+    }
   }
 
   // Register a web page

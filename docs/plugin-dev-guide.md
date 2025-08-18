@@ -97,4 +97,11 @@ Plugins have a specific lifecycle managed by the core system:
 When a plugin is disabled, its state is persisted so it remains disabled after a system restart.
 When a plugin is deleted, all its files are permanently removed from the system.
 
-When a plugin is disabled, all commands registered by that plugin are automatically unregistered from Discord.
+When a plugin is disabled:
+- All commands registered by that plugin are automatically unregistered from Discord
+- All web routes registered by that plugin are automatically unregistered
+- The plugin's `destroy()` function is called
+
+When a plugin is re-enabled:
+- The plugin's `init(core)` function is called again
+- Commands and routes are re-registered
