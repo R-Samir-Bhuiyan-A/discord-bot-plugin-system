@@ -86,6 +86,7 @@ class DiscordManager {
 
       // Convert our commands to Discord's format
       const commands = [];
+      console.log(`Registering Discord commands. Current commands in API:`, Array.from(this.core.api.commands.keys()));
       for (const [name, command] of this.core.api.commands) {
         commands.push({
           name: name,
@@ -133,6 +134,7 @@ class DiscordManager {
   
   // Register a command from a plugin
   registerPluginCommand(pluginName, commandName, description, handler) {
+    console.log(`Registering plugin command ${commandName} from plugin ${pluginName}`);
     // Store the command with plugin association
     this.registeredCommands.set(commandName, pluginName);
     

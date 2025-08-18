@@ -25,6 +25,7 @@ class API {
       throw new Error('Invalid parameters for registerCommand');
     }
     
+    console.log(`Registering plugin command: ${name} for plugin ${pluginName}`);
     // Delegate to DiscordManager for plugin-specific command registration
     this.core.discord.registerPluginCommand(pluginName, name, description, handler);
   }

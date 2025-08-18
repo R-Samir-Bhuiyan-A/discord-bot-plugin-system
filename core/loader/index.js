@@ -24,9 +24,11 @@ class PluginLoader {
 
       // Load plugin states
       const pluginStates = await this.loadPluginStates();
+      console.log(`Loaded plugin states:`, pluginStates);
 
       // Load all plugins
       const pluginDirs = await fs.readdir(this.pluginPath);
+      console.log(`Found plugin directories:`, pluginDirs);
       
       for (const dir of pluginDirs) {
         const pluginDir = path.join(this.pluginPath, dir);
@@ -35,11 +37,13 @@ class PluginLoader {
         if (stat.isDirectory()) {
           // Enable plugin if it's not explicitly disabled in the states file
           const shouldBeEnabled = pluginStates[dir] !== false;
+          console.log(`Plugin ${dir} should be enabled: ${shouldBeEnabled} (state: ${pluginStates[dir]})`);
           await this.loadPlugin(dir, shouldBeEnabled);
         }
       }
       
       console.log(`Loaded ${this.plugins.size} plugins`);
+      console.log(`Enabled plugins:`, Array.from(this.enabledPlugins.keys()));
     } catch (error) {
       console.error('Failed to initialize plugin loader:', error);
       throw error;
@@ -84,6 +88,7 @@ class PluginLoader {
       
       // Enable the plugin if it should be enabled
       if (shouldBeEnabled) {
+        console.log(`Enabling plugin ${pluginName} on startup`);
         await this.enablePlugin(pluginName);
       }
     } catch (error) {
@@ -123,6 +128,8 @@ class PluginLoader {
         console.log(`Plugin ${pluginName} is already enabled`);
         return;
       }
+      
+      console.log(`Enabling plugin: ${pluginName}`);
       
       // Initialize plugin in sandbox
       try {

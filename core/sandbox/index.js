@@ -101,6 +101,7 @@ class PluginSandbox {
       api: {
         // Plugin-specific command registration
         registerCommand: (name, description, handler) => {
+          console.log(`Plugin registering command: ${name}`);
           // Track the command for this plugin
           if (!this.pluginCommands.has(pluginName)) {
             this.pluginCommands.set(pluginName, []);
@@ -112,6 +113,7 @@ class PluginSandbox {
         },
         // Plugin-specific route registration
         registerRoute: (path, handler) => {
+          console.log(`Plugin registering route: ${path}`);
           // Track the route for this plugin
           if (!this.pluginRoutes.has(pluginName)) {
             this.pluginRoutes.set(pluginName, []);

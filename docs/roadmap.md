@@ -17,6 +17,7 @@
 - [x] Real-time bot status dashboard
 - [x] Fixed plugin state persistence and command registration issues
 - [x] Fixed plugin resource unregistration (commands, routes) when disabling plugins
+- [x] Added debugging logging to trace plugin loading and command registration
 
 ## Phase 4 – Reliability & Scheduler
 - [ ] Logging, auto-reload, sandboxing
