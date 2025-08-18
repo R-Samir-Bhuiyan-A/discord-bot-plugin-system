@@ -82,6 +82,56 @@ Unregisters all web routes associated with a plugin.
 
 - `pluginName` (string): The name of the plugin whose routes should be unregistered
 
+## Logger API
+
+The core system provides a centralized logging system with configurable levels:
+
+### debug(namespace, message)
+
+Logs a debug message.
+
+- `namespace` (string): The namespace for the log message
+- `message` (string): The log message
+
+### info(namespace, message)
+
+Logs an info message.
+
+- `namespace` (string): The namespace for the log message
+- `message` (string): The log message
+
+### warn(namespace, message)
+
+Logs a warning message.
+
+- `namespace` (string): The namespace for the log message
+- `message` (string): The log message
+
+### error(namespace, message)
+
+Logs an error message.
+
+- `namespace` (string): The namespace for the log message
+- `message` (string): The log message
+
+### getLogger(namespace)
+
+Gets a logger instance for a specific namespace.
+
+- `namespace` (string): The namespace for the logger
+
+Example:
+```javascript
+const logger = core.logger.getLogger('my-plugin');
+logger.info('Plugin loaded');
+```
+
+### setLogLevel(level)
+
+Sets the log level.
+
+- `level` (string): The log level (DEBUG, INFO, WARN, ERROR)
+
 ## Plugin Management API
 
 The core system also provides API endpoints for managing plugins through the Web UI:

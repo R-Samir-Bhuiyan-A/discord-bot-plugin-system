@@ -84,6 +84,33 @@ module.exports = {
 };
 ```
 
+## Logging
+
+Plugins can use the centralized logging system provided by the core:
+
+```javascript
+module.exports = {
+  async init(core) {
+    // Get a logger for this plugin
+    const logger = core.api.getLogger('my-plugin');
+    
+    // Log messages at different levels
+    logger.debug('Debug message');
+    logger.info('Info message');
+    logger.warn('Warning message');
+    logger.error('Error message');
+  }
+};
+```
+
+The logging system supports the following levels:
+- `debug`: Detailed debug information
+- `info`: General information about plugin operations
+- `warn`: Warning messages about potential issues
+- `error`: Error messages about failures
+
+The log level can be configured through the `LOG_LEVEL` environment variable.
+
 ## Plugin Lifecycle
 
 Plugins have a specific lifecycle managed by the core system:

@@ -4,6 +4,7 @@ const WebServer = require('./web');
 const PluginLoader = require('./loader');
 const PluginRepository = require('./repo');
 const API = require('./api');
+const Logger = require('./logger');
 
 class CoreSystem {
   constructor() {
@@ -11,6 +12,7 @@ class CoreSystem {
     this.web = new WebServer(this);
     this.plugins = new PluginLoader(this);
     this.repo = new PluginRepository(this);
+    this.logger = new Logger(this);
     this.api = new API(this);
     
     // Bind API to this context
@@ -91,6 +93,7 @@ class CoreSystem {
           return res.json({ error: 'Plugin name is required' });
         }
         
+        console.log(`API request to enable plugin: ${pluginName}`);
         await this.api.enablePlugin(pluginName);
         res.json({ message: `Plugin ${pluginName} enabled successfully` });
       } catch (error) {
@@ -109,6 +112,7 @@ class CoreSystem {
           return res.json({ error: 'Plugin name is required' });
         }
         
+        console.log(`API request to disable plugin: ${pluginName}`);
         await this.api.disablePlugin(pluginName);
         res.json({ message: `Plugin ${pluginName} disabled successfully` });
       } catch (error) {

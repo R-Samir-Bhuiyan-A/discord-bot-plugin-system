@@ -54,4 +54,5 @@
 - Added real-time bot status dashboard with monitoring
 - Fixed plugin state persistence and command registration issues
 - Fixed plugin resource unregistration (commands, routes) when disabling plugins
+- Implemented centralized logging system with configurable levels
 - Added debugging logging to trace plugin loading and command registration
