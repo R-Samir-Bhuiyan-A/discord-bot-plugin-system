@@ -1,0 +1,14 @@
+{
+  "name": "example-plugin",
+  "version": "1.0.0",
+  "author": "Project Team",
+  "description": "A sample plugin that adds a Discord command and a Web UI page.",
+  "compatibility": {
+    "core": ">=1.0.0"
+  },
+  "permissions": {
+    "discord": ["commands"],
+    "web": ["routes"]
+  },
+  "entry": "./index.js"
+}

@@ -1,0 +1,14 @@
+{
+  "name": "error-test-plugin",
+  "version": "1.0.0",
+  "author": "Project Team",
+  "description": "A test plugin that throws an error to verify sandboxing.",
+  "compatibility": {
+    "core": ">=1.0.0"
+  },
+  "permissions": {
+    "discord": [],
+    "web": ["routes"]
+  },
+  "entry": "./index.js"
+}

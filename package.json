@@ -1,0 +1,27 @@
+{
+  "name": "discord-bot-plugin-system",
+  "version": "1.0.0",
+  "description": "A plugin-based Discord bot system with Web UI",
+  "main": "core/index.js",
+  "scripts": {
+    "dev": "node scripts/start.js",
+    "build": "next build core/web/app",
+    "start": "node index.js",
+    "lint": "next lint core/web/app",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:sandbox": "jest tests/sandbox.test.js"
+  },
+  "dependencies": {
+    "discord.js": "^14.11.0",
+    "dotenv": "^16.3.1",
+    "next": "^13.4.12",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  },
+  "devDependencies": {
+    "eslint": "^8.45.0",
+    "eslint-config-next": "^13.4.12",
+    "jest": "^29.6.1"
+  }
+}

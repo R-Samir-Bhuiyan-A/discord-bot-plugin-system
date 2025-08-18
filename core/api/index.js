@@ -1,0 +1,83 @@
+// core/api/index.js
+class API {
+  constructor(core) {
+    this.core = core;
+    this.commands = new Map();
+    this.events = new Map();
+    this.routes = new Map();
+    this.pages = new Map();
+  }
+
+  // Register a Discord command
+  registerCommand(name, description, handler) {
+    if (typeof name !== 'string' || typeof description !== 'string' || typeof handler !== 'function') {
+      throw new Error('Invalid parameters for registerCommand');
+    }
+    
+    this.commands.set(name, { description, handler });
+    console.log(`Registered command: ${name}`);
+  }
+
+  // Register an event handler
+  registerEvent(event, handler) {
+    if (typeof event !== 'string' || typeof handler !== 'function') {
+      throw new Error('Invalid parameters for registerEvent');
+    }
+    
+    if (!this.events.has(event)) {
+      this.events.set(event, []);
+    }
+    
+    this.events.get(event).push(handler);
+    console.log(`Registered event handler for: ${event}`);
+  }
+
+  // Register a web route
+  registerRoute(path, handler) {
+    if (typeof path !== 'string' || typeof handler !== 'function') {
+      throw new Error('Invalid parameters for registerRoute');
+    }
+    
+    this.routes.set(path, handler);
+    console.log(`Registered route: ${path}`);
+  }
+
+  // Register a web page
+  registerPage(path, component) {
+    if (typeof path !== 'string') {
+      throw new Error('Invalid parameters for registerPage');
+    }
+    
+    this.pages.set(path, component);
+    console.log(`Registered page: ${path}`);
+  }
+
+  // Get a logger instance
+  getLogger(name) {
+    return {
+      info: (message) => console.log(`[INFO] [${name}] ${message}`),
+      warn: (message) => console.warn(`[WARN] [${name}] ${message}`),
+      error: (message) => console.error(`[ERROR] [${name}] ${message}`),
+      debug: (message) => console.debug(`[DEBUG] [${name}] ${message}`)
+    };
+  }
+  
+  // Plugin management functions (bound to PluginLoader in CoreSystem)
+  // These will be bound to the PluginLoader instance
+  enablePlugin(pluginName) {
+    // This will be bound to PluginLoader.enablePlugin
+    throw new Error('enablePlugin not bound to PluginLoader');
+  }
+  
+  disablePlugin(pluginName) {
+    // This will be bound to PluginLoader.disablePlugin
+    throw new Error('disablePlugin not bound to PluginLoader');
+  }
+  
+  getPlugins() {
+    // This will be bound to PluginLoader.getPlugins
+    throw new Error('getPlugins not bound to PluginLoader');
+  }
+}
+
+module.exports = API;
