@@ -108,3 +108,20 @@ Get a list of available plugins from the repository.
 Install a plugin from the repository.
 
 - Body: `{ "pluginName": "plugin-name" }`
+
+## Bot Status API
+
+### GET /api/bot/status
+
+Get the current status of the Discord bot.
+
+Response:
+```json
+{
+  "status": "online|connecting|disconnected",
+  "username": "BotUsername#0000",
+  "guildCount": 10,
+  "userCount": 1000,
+  "uptime": 3600000
+}
+```

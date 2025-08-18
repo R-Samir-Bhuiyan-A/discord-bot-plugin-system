@@ -51,3 +51,4 @@
 - Implemented persistent plugin states across application restarts
 - Added plugin deletion functionality with confirmation dialog
 - Improved frontend error handling and user feedback
+- Added real-time bot status dashboard with monitoring

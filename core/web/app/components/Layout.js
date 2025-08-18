@@ -9,12 +9,12 @@ export default function Layout({ children }) {
         <div className="navbar-container">
           <div className="navbar-content">
             <div className="flex items-center">
-              <Link href="/" className="navbar-brand">
+              <Link href="/dashboard" className="navbar-brand">
                 Discord Bot Plugin System
               </Link>
             </div>
             <div className="navbar-nav">
-              <Link href="/" className="nav-link">
+              <Link href="/dashboard" className="nav-link">
                 Dashboard
               </Link>
               <Link href="/plugins" className="nav-link">

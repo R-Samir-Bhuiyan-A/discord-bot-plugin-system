@@ -158,12 +158,25 @@ class CoreSystem {
           return res.json({ error: 'Plugin name is required' });
         }
         
+        console.log(`API request to install plugin: ${pluginName}`);
         await this.api.installPlugin(pluginName);
         res.json({ message: `Plugin ${pluginName} installed successfully` });
       } catch (error) {
         console.error('Error installing plugin:', error);
         res.statusCode = 500;
         res.json({ error: error.message || 'Failed to install plugin' });
+      }
+    });
+    
+    // Get bot status
+    this.api.registerRoute('/api/bot/status', (req, res) => {
+      try {
+        const status = this.discord.getBotStatus();
+        res.json(status);
+      } catch (error) {
+        console.error('Error fetching bot status:', error);
+        res.statusCode = 500;
+        res.json({ error: 'Failed to fetch bot status' });
       }
     });
     

@@ -111,6 +111,24 @@ class DiscordManager {
       await this.client.destroy();
     }
   }
+  
+  // Get bot status information
+  getBotStatus() {
+    if (!this.client) {
+      return {
+        status: 'disconnected',
+        message: 'Discord client not initialized'
+      };
+    }
+    
+    return {
+      status: this.client.readyAt ? 'online' : 'connecting',
+      username: this.client.user ? this.client.user.tag : null,
+      guildCount: this.client.guilds ? this.client.guilds.cache.size : 0,
+      userCount: this.client.users ? this.client.users.cache.size : 0,
+      uptime: this.client.uptime ? this.client.uptime : 0
+    };
+  }
 }
 
 module.exports = DiscordManager;

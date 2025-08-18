@@ -14,6 +14,7 @@
 - [x] Persistent plugin states across restarts
 - [x] Plugin deletion functionality
 - [x] Improved error handling and user feedback
+- [x] Real-time bot status dashboard
 
 ## Phase 4 – Reliability & Scheduler
 - [ ] Logging, auto-reload, sandboxing
