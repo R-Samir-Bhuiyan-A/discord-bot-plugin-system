@@ -13,6 +13,7 @@
 - [x] Core API endpoints for plugin management
 - [x] Persistent plugin states across restarts
 - [x] Plugin deletion functionality
+- [x] Improved error handling and user feedback
 
 ## Phase 4 – Reliability & Scheduler
 - [ ] Logging, auto-reload, sandboxing

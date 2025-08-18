@@ -49,4 +49,5 @@
 - Improved error handling in PluginLoader and PluginRepository
 - Added better error messages and status codes to API responses
 - Implemented persistent plugin states across application restarts
-- Added plugin deletion functionality
+- Added plugin deletion functionality with confirmation dialog
+- Improved frontend error handling and user feedback

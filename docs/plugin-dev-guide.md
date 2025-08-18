@@ -83,3 +83,16 @@ module.exports = {
   }
 };
 ```
+
+## Plugin Lifecycle
+
+Plugins have a specific lifecycle managed by the core system:
+
+1. **Loading**: When the system starts, it loads all plugins from the `plugins/` directory
+2. **Initialization**: The `init(core)` function is called for each plugin
+3. **Enable/Disable**: Plugins can be enabled or disabled at runtime through the Web UI
+4. **Deletion**: Plugins can be permanently deleted through the Web UI
+5. **Destruction**: The `destroy()` function is called when a plugin is disabled or the system shuts down
+
+When a plugin is disabled, its state is persisted so it remains disabled after a system restart.
+When a plugin is deleted, all its files are permanently removed from the system.

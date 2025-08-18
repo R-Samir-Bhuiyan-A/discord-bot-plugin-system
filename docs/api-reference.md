@@ -72,3 +72,39 @@ Example:
 const logger = core.api.getLogger('my-plugin');
 logger.info('Plugin loaded');
 ```
+
+## Plugin Management API
+
+The core system also provides API endpoints for managing plugins through the Web UI:
+
+### GET /api/plugins
+
+Get a list of all installed plugins with their current status (enabled/disabled).
+
+### POST /api/plugins/enable
+
+Enable a plugin.
+
+- Body: `{ "pluginName": "plugin-name" }`
+
+### POST /api/plugins/disable
+
+Disable a plugin.
+
+- Body: `{ "pluginName": "plugin-name" }`
+
+### POST /api/plugins/delete
+
+Delete a plugin permanently.
+
+- Body: `{ "pluginName": "plugin-name" }`
+
+### GET /api/repo/plugins
+
+Get a list of available plugins from the repository.
+
+### POST /api/repo/install
+
+Install a plugin from the repository.
+
+- Body: `{ "pluginName": "plugin-name" }`
