@@ -22,23 +22,37 @@ class WebServer {
       await this.app.prepare();
 
       // Create HTTP server
-      this.server = createServer(async (req, res) => {
+      this.server = createServer((req, res) => {
         // Add body parsing for POST requests
         if (req.method === 'POST' || req.method === 'PUT') {
           let body = '';
           req.on('data', chunk => {
             body += chunk.toString();
           });
-          req.on('end', () => {
+          req.on('end', async () => {
             try {
               req.body = JSON.parse(body);
             } catch (error) {
               req.body = {};
             }
-            this.handleRequest(req, res, handle);
+            try {
+              await this.handleRequest(req, res, handle);
+            } catch (error) {
+              console.error('Error handling request:', error);
+              if (!res.headersSent) {
+                res.statusCode = 500;
+                res.end('Internal server error');
+              }
+            }
           });
         } else {
-          this.handleRequest(req, res, handle);
+          this.handleRequest(req, res, handle).catch(error => {
+            console.error('Error handling request:', error);
+            if (!res.headersSent) {
+              res.statusCode = 500;
+              res.end('Internal server error');
+            }
+          });
         }
       });
 

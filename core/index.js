@@ -94,10 +94,13 @@ class CoreSystem {
         }
         
         console.log(`API request to enable plugin: ${pluginName}`);
+        console.log(`About to call this.api.enablePlugin(${pluginName})`);
         await this.api.enablePlugin(pluginName);
+        console.log(`Successfully enabled plugin: ${pluginName}`);
         res.json({ message: `Plugin ${pluginName} enabled successfully` });
       } catch (error) {
         console.error('Error enabling plugin:', error);
+        console.error('Error stack:', error.stack);
         res.statusCode = 500;
         res.json({ error: error.message || 'Failed to enable plugin' });
       }
@@ -113,10 +116,13 @@ class CoreSystem {
         }
         
         console.log(`API request to disable plugin: ${pluginName}`);
+        console.log(`About to call this.api.disablePlugin(${pluginName})`);
         await this.api.disablePlugin(pluginName);
+        console.log(`Successfully disabled plugin: ${pluginName}`);
         res.json({ message: `Plugin ${pluginName} disabled successfully` });
       } catch (error) {
         console.error('Error disabling plugin:', error);
+        console.error('Error stack:', error.stack);
         res.statusCode = 500;
         res.json({ error: error.message || 'Failed to disable plugin' });
       }

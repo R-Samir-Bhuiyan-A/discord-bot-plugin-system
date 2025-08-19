@@ -74,22 +74,25 @@ class PluginLoader {
       const entryPath = path.join(pluginDir, manifest.entry);
       const pluginModule = require(entryPath);
       
-      // Store plugin reference
+      // Store plugin reference with correct enabled state
       const plugin = {
         name: pluginName,
         manifest,
         module: pluginModule,
-        enabled: false
+        enabled: false // Initially false, will be set to true if enabled
       };
       
       this.plugins.set(pluginName, plugin);
       
-      console.log(`Loaded plugin: ${pluginName}`);
+      console.log(`Loaded plugin: ${pluginName} (should be enabled: ${shouldBeEnabled})`);
       
       // Enable the plugin if it should be enabled
       if (shouldBeEnabled) {
         console.log(`Enabling plugin ${pluginName} on startup`);
+        // Call enablePlugin to ensure proper initialization and state saving
         await this.enablePlugin(pluginName);
+      } else {
+        console.log(`Plugin ${pluginName} will remain disabled on startup`);
       }
     } catch (error) {
       console.error(`Failed to load plugin ${pluginName}:`, error);
@@ -119,50 +122,93 @@ class PluginLoader {
 
   async enablePlugin(pluginName) {
     try {
+      console.log(`[DEBUG] enablePlugin called with pluginName: ${pluginName}`);
       const plugin = this.plugins.get(pluginName);
       if (!plugin) {
+        console.log(`[DEBUG] Plugin ${pluginName} not found in plugins map`);
         throw new Error(`Plugin ${pluginName} not found`);
       }
       
       if (plugin.enabled) {
-        console.log(`Plugin ${pluginName} is already enabled`);
+        console.log(`[DEBUG] Plugin ${pluginName} is already enabled`);
         return;
       }
       
-      console.log(`Enabling plugin: ${pluginName}`);
+      console.log(`[DEBUG] Enabling plugin: ${pluginName}`);
       
-      // Initialize plugin in sandbox
-      try {
-        await this.sandbox.runPluginMethod(pluginName, plugin.module, 'init', this.core);
-      } catch (error) {
-        console.error(`Failed to initialize plugin ${pluginName} in sandbox:`, error);
-        throw error;
-      }
-      
-      // Mark plugin as enabled
+      // Mark plugin as enabled BEFORE initializing in sandbox
+      // This ensures the state is saved even if sandbox initialization fails
       plugin.enabled = true;
       this.enabledPlugins.set(pluginName, plugin);
       
-      // Save plugin state
-      await this.savePluginState(pluginName, true);
+      // Save plugin state immediately
+      console.log(`[DEBUG] About to save plugin state for ${pluginName}: true`);
+      try {
+        await this.savePluginState(pluginName, true);
+        console.log(`[DEBUG] Successfully saved plugin state for ${pluginName}`);
+      } catch (error) {
+        console.error(`[ERROR] Failed to save plugin state for ${pluginName}:`, error);
+        // Even if saving fails, we still want to try to initialize the plugin
+      }
       
-      console.log(`Enabled plugin: ${pluginName}`);
+      // Initialize plugin in sandbox
+      try {
+        console.log(`[DEBUG] About to initialize plugin ${pluginName} in sandbox`);
+        await this.sandbox.runPluginMethod(pluginName, plugin.module, 'init', this.core);
+        console.log(`[DEBUG] Successfully initialized plugin ${pluginName} in sandbox`);
+      } catch (error) {
+        console.error(`[ERROR] Failed to initialize plugin ${pluginName} in sandbox:`, error);
+        // Don't re-throw the error - the plugin state should still be saved
+      }
+      
+      console.log(`[DEBUG] Enabled plugin: ${pluginName}`);
     } catch (error) {
-      console.error(`Failed to enable plugin ${pluginName}:`, error);
+      console.error(`[ERROR] Failed to enable plugin ${pluginName}:`, error);
+      // Make sure to mark the plugin as disabled if there was an error
+      const plugin = this.plugins.get(pluginName);
+      if (plugin) {
+        plugin.enabled = false;
+        this.enabledPlugins.delete(pluginName);
+        // Try to save the disabled state
+        try {
+          await this.savePluginState(pluginName, false);
+        } catch (saveError) {
+          console.error(`[ERROR] Failed to save disabled state for ${pluginName}:`, saveError);
+        }
+      }
       throw error; // Re-throw the error so the API can handle it
     }
   }
 
   async disablePlugin(pluginName) {
     try {
+      console.log(`[DEBUG] disablePlugin called with pluginName: ${pluginName}`);
       const plugin = this.plugins.get(pluginName);
       if (!plugin) {
+        console.log(`[DEBUG] Plugin ${pluginName} not found in plugins map`);
         throw new Error(`Plugin ${pluginName} not found`);
       }
       
       if (!plugin.enabled) {
-        console.log(`Plugin ${pluginName} is already disabled`);
+        console.log(`[DEBUG] Plugin ${pluginName} is already disabled`);
         return;
+      }
+      
+      console.log(`[DEBUG] Disabling plugin: ${pluginName}`);
+      
+      // Mark plugin as disabled BEFORE destroying in sandbox
+      // This ensures the state is saved even if sandbox destruction fails
+      plugin.enabled = false;
+      this.enabledPlugins.delete(pluginName);
+      
+      // Save plugin state immediately
+      console.log(`[DEBUG] About to save plugin state for ${pluginName}: false`);
+      try {
+        await this.savePluginState(pluginName, false);
+        console.log(`[DEBUG] Successfully saved plugin state for ${pluginName}`);
+      } catch (error) {
+        console.error(`[ERROR] Failed to save plugin state for ${pluginName}:`, error);
+        // Even if saving fails, we still want to try to destroy the plugin
       }
       
       // Unregister plugin resources (commands, routes, etc.)
@@ -170,21 +216,29 @@ class PluginLoader {
       
       // Destroy plugin in sandbox
       try {
+        console.log(`[DEBUG] About to destroy plugin ${pluginName} in sandbox`);
         await this.sandbox.runPluginMethod(pluginName, plugin.module, 'destroy');
+        console.log(`[DEBUG] Successfully destroyed plugin ${pluginName} in sandbox`);
       } catch (error) {
-        console.error(`Failed to destroy plugin ${pluginName} in sandbox:`, error);
+        console.error(`[ERROR] Failed to destroy plugin ${pluginName} in sandbox:`, error);
+        // Don't re-throw the error - the plugin state should still be saved
       }
       
-      // Mark plugin as disabled
-      plugin.enabled = false;
-      this.enabledPlugins.delete(pluginName);
-      
-      // Save plugin state
-      await this.savePluginState(pluginName, false);
-      
-      console.log(`Disabled plugin: ${pluginName}`);
+      console.log(`[DEBUG] Disabled plugin: ${pluginName}`);
     } catch (error) {
-      console.error(`Failed to disable plugin ${pluginName}:`, error);
+      console.error(`[ERROR] Failed to disable plugin ${pluginName}:`, error);
+      // Make sure to mark the plugin as enabled if there was an error
+      const plugin = this.plugins.get(pluginName);
+      if (plugin) {
+        plugin.enabled = true;
+        this.enabledPlugins.set(pluginName, plugin);
+        // Try to save the enabled state
+        try {
+          await this.savePluginState(pluginName, true);
+        } catch (saveError) {
+          console.error(`[ERROR] Failed to save enabled state for ${pluginName}:`, saveError);
+        }
+      }
       throw error; // Re-throw the error so the API can handle it
     }
   }
@@ -224,10 +278,31 @@ class PluginLoader {
   }
 
   async destroy() {
-    // Disable all plugins
+    // Disable all plugins for cleanup (without saving state changes)
     for (const [pluginName] of this.enabledPlugins) {
-      await this.disablePlugin(pluginName);
+      try {
+        const plugin = this.plugins.get(pluginName);
+        if (plugin) {
+          // Unregister plugin resources (commands, routes, etc.)
+          this.sandbox.unregisterPluginResources(pluginName);
+          
+          // Destroy plugin in sandbox
+          try {
+            await this.sandbox.runPluginMethod(pluginName, plugin.module, 'destroy');
+          } catch (error) {
+            console.error(`Failed to destroy plugin ${pluginName} in sandbox:`, error);
+          }
+          
+          // Mark plugin as disabled (but don't save state)
+          plugin.enabled = false;
+        }
+      } catch (error) {
+        console.error(`Error disabling plugin ${pluginName} during shutdown:`, error);
+      }
     }
+    
+    // Clear enabled plugins map
+    this.enabledPlugins.clear();
     
     // Unload all plugins
     for (const [pluginName] of this.plugins) {
@@ -253,8 +328,11 @@ class PluginLoader {
   async loadPluginStates() {
     try {
       const data = await fs.readFile(this.stateFile, 'utf8');
-      return JSON.parse(data);
+      const states = JSON.parse(data);
+      console.log(`[DEBUG] Loaded plugin states from file:`, states);
+      return states;
     } catch (error) {
+      console.log(`[DEBUG] Plugin states file not found or invalid, using defaults`);
       // If file doesn't exist or is invalid, return empty object
       return {};
     }
@@ -263,11 +341,15 @@ class PluginLoader {
   // Save plugin state to file
   async savePluginState(pluginName, enabled) {
     try {
+      console.log(`[DEBUG] savePluginState called for ${pluginName} with value ${enabled}`);
       // Load existing states
       const states = await this.loadPluginStates();
       
       // Update state for this plugin
       states[pluginName] = enabled;
+      
+      console.log(`[DEBUG] Saving plugin state for ${pluginName}: ${enabled}`);
+      console.log(`[DEBUG] Current states object:`, JSON.stringify(states, null, 2));
       
       // Create config directory if it doesn't exist
       const configDir = path.dirname(this.stateFile);
@@ -278,9 +360,13 @@ class PluginLoader {
       }
       
       // Save states to file
+      console.log(`[DEBUG] Writing to file: ${this.stateFile}`);
       await fs.writeFile(this.stateFile, JSON.stringify(states, null, 2));
+      console.log(`[DEBUG] Saved plugin states to file:`, states);
     } catch (error) {
-      console.error(`Failed to save plugin state for ${pluginName}:`, error);
+      console.error(`[ERROR] Failed to save plugin state for ${pluginName}:`, error);
+      console.error(`[ERROR] Error stack:`, error.stack);
+      throw error;
     }
   }
   
